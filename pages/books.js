@@ -17,6 +17,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import { mainListItems } from '../components/admin-components/listItems';
 import { AppBar } from '../components/admin-dash-comps/_appbar.js';
 import { Drawer } from '../components/admin-dash-comps/_drawer.js'
+import Orders from '../components/admin-components/Orders.js';
 
 const mdTheme = createTheme();
 
@@ -97,9 +98,22 @@ function BooksContent() {
             overflow: 'auto',
           }}
         >
-          <Toolbar />
+         
           
         </Box>
+        <Toolbar />
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Grid>
+              
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                  <Orders />
+                  {/* <Form /> */}
+                </Paper>
+              </Grid>
+            </Grid>
+
+          </Container>
 
       </Box>
     </ThemeProvider>
