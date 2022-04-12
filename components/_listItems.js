@@ -1,7 +1,6 @@
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PeopleIcon from "@mui/icons-material/People";
-import BarChartIcon from "@mui/icons-material/BarChart";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
@@ -24,11 +23,6 @@ export const mainListItems = (
       text={"Customers"}
       icon={<PeopleIcon />}
       navigateTo="/customers"
-    />
-    <DrawerItem
-      text={"Reports"}
-      icon={<BarChartIcon />}
-      navigateTo="/reports"
     />
   </>
 );
