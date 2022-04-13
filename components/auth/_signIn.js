@@ -30,7 +30,7 @@ export default function SignIn() {
         alignItems: "center",
         px: 10,
         py: 5,
-        margin: "auto",
+        margin: "2rem auto",
         border: "1px solid black",
       }}
       maxWidth="sm"

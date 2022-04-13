@@ -68,7 +68,6 @@ export default function _editOrder({ id }) {
           display: "flex",
           flexDirection: "column",
           gap: 1,
-          padding: 2,
         }}
       >
         <Box

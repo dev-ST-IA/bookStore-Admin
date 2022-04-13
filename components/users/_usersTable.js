@@ -61,31 +61,20 @@ export default function _usersTable() {
           width: "90%",
           display: "flex",
           flexDirection: "row",
-          justifyContent: "flex-start",
+          justifyContent: "flex-end",
           gap: 1,
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            gap: 1,
-            flexGrow: 1,
-          }}
+        <_modelWithButton
+          buttonColor={"error"}
+          buttonText="Delete User"
+          buttonIcon={<DeleteIcon />}
+          setOpen={setDeleteOpen}
+          open={deleteModel}
+          width={300}
         >
-
-          <_modelWithButton
-            buttonColor={"error"}
-            buttonText="Delete User"
-            buttonIcon={<DeleteIcon />}
-            setOpen={setDeleteOpen}
-            open={deleteModel}
-            width={300}
-          >
-            <_deleteUsers id={1} />
-          </_modelWithButton>
-        </Box>
+          <_deleteUsers id={1} />
+        </_modelWithButton>
         <_modelWithButton
           buttonColor={"primary"}
           buttonText="Add New Users"
