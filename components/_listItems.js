@@ -5,6 +5,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import DrawerItem from "./_drawerItem";
+import ReceiptIcon from '@mui/icons-material/Receipt';
 
 export const mainListItems = (
   <>
@@ -23,6 +24,11 @@ export const mainListItems = (
       text={"Customers"}
       icon={<PeopleIcon />}
       navigateTo="/customers"
+    />
+    <DrawerItem
+      text={"Sales"}
+      icon={<ReceiptIcon />}
+      navigateTo="/sales"
     />
   </>
 );
