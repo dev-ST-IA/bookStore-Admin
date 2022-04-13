@@ -6,10 +6,15 @@ import MetaHead from "./_head";
 import { Toolbar } from "@mui/material";
 import { Container } from "@mui/material";
 import Footer from "./_footer";
+import { useSelector } from "react-redux";
 
 export default function Layout({ children, pageTitle = "" }) {
-  const theme = createTheme();
-
+  const mode = useSelector(state=>state.themeMode.mode)
+  const theme = createTheme({
+    palette:{
+      mode
+    },
+  });
   return (
     <ThemeProvider theme={theme}>
       <MetaHead title={pageTitle} />
@@ -29,7 +34,7 @@ export default function Layout({ children, pageTitle = "" }) {
             component="main"
             sx={{
               backgroundColor: (theme) =>
-                theme.palette.mode === "light"
+                  mode === "light"
                   ? theme.palette.grey[100]
                   : theme.palette.grey[900],
               flexGrow: 1,

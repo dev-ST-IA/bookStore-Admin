@@ -8,6 +8,7 @@ import List from "@mui/material/List";
 import { styled } from "@mui/material/styles";
 import { Typography, Button } from "@mui/material";
 import Link from "next/link";
+import { useSelector } from "react-redux";
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -36,8 +37,13 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export default function _Drawer({ open, toggleDrawer, drawerwidth }) {
+  // const mode = useSelector(state=>state.themeMode.mode)
   return (
-    <Drawer variant="permanent" open={open} drawerwidth={drawerwidth}>
+    <Drawer 
+    variant="permanent" 
+    open={open} 
+    drawerwidth={drawerwidth} 
+    >
       <Toolbar
         sx={{
           display: "flex",

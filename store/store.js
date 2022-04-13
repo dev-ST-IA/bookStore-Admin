@@ -13,11 +13,12 @@ import {
 } from "redux-persist";
 import storage from "../utils/storage";
 
+
 const persistConfig = {
   key: "root",
   version: 1,
   storage,
-  whitelist: ["auth"],
+  whitelist: ["auth", "themeMode"],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducer);

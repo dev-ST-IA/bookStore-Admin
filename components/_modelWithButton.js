@@ -61,7 +61,7 @@ export default function _modelWithButton({
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: width,
-            bgcolor: (theme) => theme.palette.grey[100],
+            bgcolor: (theme) => theme.palette.background.paper,
             boxShadow: 24,
             p: 3,
           }}
