@@ -1,6 +1,6 @@
 import "../styles/globals.css";
 import { Provider } from "react-redux";
-import { store } from "../store/store";
+import { store } from "../store/store.js";
 
 function MyApp({ Component, pageProps }) {
   const Layout = Component.getLayout || ((page) => page);
