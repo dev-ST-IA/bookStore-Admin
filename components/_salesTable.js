@@ -2,9 +2,6 @@ import React from "react";
 import { useDemoData } from "@mui/x-data-grid-generator";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
-import { TextField } from "@mui/material";
-import _modelWithButton from "./_modelWithButton";
-
 import { useSelector } from "react-redux";
 
 export default function _customersTable() {
@@ -28,12 +25,6 @@ export default function _customersTable() {
   return (
     <React.Fragment>
       <Box sx={{ margin: "1rem auto", width: "90%" }}>
-        <TextField
-          id="standard-basic"
-          label="Search Sales"
-          variant="standard"
-          fullWidth
-        />
       </Box>
       <Box
         sx={{
