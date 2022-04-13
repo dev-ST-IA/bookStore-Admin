@@ -30,7 +30,7 @@ export default function _customersTable() {
       <Box sx={{ margin: "1rem auto", width: "90%" }}>
         <TextField
           id="standard-basic"
-          label="Search Customers"
+          label="Search Sales"
           variant="standard"
           fullWidth
         />
