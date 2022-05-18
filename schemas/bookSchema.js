@@ -6,7 +6,7 @@ export const bookSchema = Yup.object().shape({
     .min(5, "Too Short!")
     .max(60, "Too Long!")
     .required(),
-  Author: Yup.string("Enter Author Name")
+  AuthorName: Yup.string("Enter Author Name")
     .min(5, "Too Short!")
     .max(30, "Too Long!")
     .required(),

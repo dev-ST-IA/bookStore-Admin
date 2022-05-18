@@ -3,47 +3,55 @@ import { Box } from "@mui/system";
 import { TextField, Typography } from "@mui/material";
 import { Input } from "@mui/material";
 import { Button } from "@mui/material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setEditOpen } from "../../store/modelSlice";
-import { useFormik } from "formik";
-import { bookSchema } from "../../schemas/bookSchema";
 import { useState, useEffect } from "react";
-import { Autocomplete } from "@mui/material";
+import {
+  useGetOrderQuery,
+  useChangeOrderStatusMutation,
+} from "../../services/bookStoreApi";
+import _receipt from "./_receipt";
+import ToasterAlert from "../_alertToaster";
+import { setOpen } from "../../store/toasterSlice";
+import _statusChanger from "./_statusChanger";
 
 export default function _editOrder({ id }) {
-  const [initialValues, setInitialValues] = useState({
-    Title: "",
-    Author: "",
-    CategoryName: "",
-    Publisher: "",
-    Price: "",
-    Cost: "",
-    Units: "",
-    Description: "",
-    Image: null,
-  });
   const dispatch = useDispatch();
+  const { data: orderData, refetch, ...orderDataArgs } = useGetOrderQuery(id);
+  const [edit, { ...editArgs }] = useChangeOrderStatusMutation();
+  const [alert, setAlert] = useState({ message: "", severity: "" });
+  const open = useSelector((state) => state.toaster.open);
+  const [marked, setMarked] = useState(false);
 
-  const formik = useFormik({
-    initialValues: {
-      Title: "",
-      Author: "",
-      CategoryName: "",
-      Publisher: "",
-      Price: "",
-      Cost: "",
-      Units: "",
-      Description: "",
-      Image: null,
-    },
-    validationSchema: bookSchema,
-  });
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const changeStatus = async (value) => {
+    try {
+      const res = await edit({ id: id, status: value }).unwrap();
+      setAlert({ message: "Success", severity: "success" });
+      dispatch(setOpen(true));
+      setAlert({
+        message: "Status Changed Successfully",
+        severity: "success",
+      });
+      refetch();
+      setMarked(true);
+    } catch (error) {
+      console.log(error);
+      setMarked(false);
+      setAlert({
+        message: "Something Went Wrong,Failed To Mark",
+        severity: "error",
+      });
+      dispatch(setOpen(true));
+    }
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (!id || orderDataArgs.isError) {
+      dispatch(setEditOpen(false));
+      dispatch(setOpen(true));
+      setAlert({ message: "Something Went Wrong", severity: "error" });
+    }
+  }, [id, orderDataArgs.isError]);
 
   return (
     <Box
@@ -55,12 +63,15 @@ export default function _editOrder({ id }) {
         width: 1,
       }}
     >
+      <ToasterAlert
+        isOpen={open}
+        severity={alert.severity}
+        message={alert.message}
+      />
       <Typography textAlign={"left"} variant="h5" component="h5">
         Change Order Status
       </Typography>
       <Box
-        component="form"
-        onSubmit={handleSubmit}
         sx={{
           maxHeight: 400,
           width: 1,
@@ -74,135 +85,105 @@ export default function _editOrder({ id }) {
           sx={{
             display: "flex",
             flexDirection: "column",
-            gap: 1,
             overflow: "auto",
             margin: "auto",
             width: 1,
             padding: 3,
+            gap: 2,
           }}
         >
           <Box
             sx={{
               display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
+              flexDirection: "row",
+              gap: 1,
               justifyContent: "space-between",
             }}
           >
-            <Typography variant="h6" component="h6">
-              Order Id
-            </Typography>
-            <Typography variant="body1" component="h6">
-              2
-            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography variant="h6" component="h6">
+                Order Id
+              </Typography>
+              <Typography variant="body1" component="h6">
+                {orderData?.id}
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography variant="h6" component="h6">
+                Order Status
+              </Typography>
+              <Typography variant="body1" component="h6">
+                {!marked ? orderData?.orderStatus : "Delivered"}
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography variant="h6" component="h6">
+                Date
+              </Typography>
+              <Typography variant="body1" component="h6">
+                {new Date(orderData?.orderDate).toLocaleDateString()}
+              </Typography>
+            </Box>
           </Box>
 
+          <Typography variant="h6" component="h6">
+            Receipt
+          </Typography>
           <Box
             sx={{
               display: "flex",
               flexDirection: "column",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
+              border: "1px solid grey",
+              padding: 1,
             }}
           >
-            <Typography variant="h6" component="h6">
-              Date
-            </Typography>
-            <Typography variant="body1" component="h6">
-              2
-            </Typography>
+            <_receipt
+              cartProducts={orderData?.cartProducts}
+              totalPrice={orderData?.totalPrice}
+            />
           </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography variant="h6" component="h6">
-              Customer Name
-            </Typography>
-            <Typography variant="body1" component="h6">
-              customer
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography variant="h6" component="h6">
-              Total Price
-            </Typography>
-            <Typography variant="body1" component="h6">
-              2000
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography variant="h6" component="h6">
-              Books Ordered
-            </Typography>
-            <Typography variant="body1" component="h6">
-              2
-            </Typography>
-          </Box>
-
-          <Autocomplete
-            options={["Completed", "Cancelled"]}
-            //   getOptionLabel
-            id="order-status"
-            //   value={value}
-            //   onChange={(event, newValue) => {
-            //     setValue(newValue);
-            //   }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Order Status"
-                name="OrderStatus"
-                variant="standard"
-              />
-            )}
+          <_statusChanger
+            changeStatus={changeStatus}
+            id={orderData?.id}
+            currentStatus={orderData?.orderStatus}
           />
         </Box>
         <Box
           sx={{
             display: "flex",
             flexDirection: "row",
-            justifyContent: "flex-end",
+            justifyContent: "center",
             gap: 1,
           }}
         >
           <Button
             variant="contained"
             size="small"
-            color="primary"
-            type="submit"
-            // disabled={!isChanged()}
-          >
-            Change Status
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
             color="warning"
             onClick={() => dispatch(setEditOpen(false))}
           >
-            Cancel
+            Close
           </Button>
         </Box>
       </Box>

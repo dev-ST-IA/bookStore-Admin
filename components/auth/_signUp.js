@@ -1,25 +1,67 @@
-import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
+import { useFormik } from "formik";
+import { registerSchema } from "../../schemas/registerSchema";
+import { useRegisterMutation } from "../../services/bookStoreApi";
+import { useSelector, useDispatch } from "react-redux";
+import { setToken, setUserDetails } from "../../store/authSlice";
+import ToasterAlert from "../_alertToaster";
+import { useRouter } from "next/dist/client/router";
+import { setOpen } from "../../store/toasterSlice";
+import { useState } from "react";
 
 export default function SignUp() {
-  const handleSubmit = (event) => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const [toaster, setToaster] = useState({ message: "", severity: "" });
+  const isOpen = useSelector((state) => state.toaster.open);
+  const [register, { data, isError, isSuccess, error, isLoading }] =
+    useRegisterMutation();
+  const formik = useFormik({
+    initialValues: {
+      emailAddress: "",
+      userName: "",
+      password: "",
+      cPassword: "",
+      phoneNumber: "",
+      firstName: "",
+      lastName: "",
+    },
+    validationSchema: registerSchema,
+    onSubmit: () => {},
+    validateOnChange: true,
+    isInitialValid: true,
+  });
+  const handleSubmit = async (event, val) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    try {
+      const payload = await register(formik.values).unwrap();
+      if (payload.token) {
+        dispatch(setToken(payload.token));
+        dispatch(setUserDetails(payload));
+        setToaster({
+          message: `Registration Success`,
+          severity: "success",
+        });
+        dispatch(setOpen(true));
+        router.push("/");
+      } else {
+      }
+    } catch (err) {
+      console.log(err);
+      setToaster({
+        message: `Registration Failed \n Error: ${error?.data?.title}`,
+        severity: "error",
+      });
+      dispatch(setOpen(true));
+    }
   };
-
   return (
     <Box
       sx={{
@@ -39,10 +81,16 @@ export default function SignUp() {
       <Typography component="h1" variant="h5">
         Sign up
       </Typography>
-      <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <TextField
+              value={formik.values.firstName}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.firstName && Boolean(formik.errors.firstName)
+              }
+              helperText={formik.touched.firstName && formik.errors.firstName}
               autoComplete="given-name"
               name="firstName"
               required
@@ -54,6 +102,10 @@ export default function SignUp() {
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
+              value={formik.values.lastName}
+              onChange={formik.handleChange}
+              error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+              helperText={formik.touched.lastName && formik.errors.lastName}
               required
               fullWidth
               id="lastName"
@@ -64,16 +116,63 @@ export default function SignUp() {
           </Grid>
           <Grid item xs={12}>
             <TextField
+              value={formik.values.emailAddress}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.emailAddress &&
+                Boolean(formik.errors.emailAddress)
+              }
+              helperText={
+                formik.touched.emailAddress && formik.errors.emailAddress
+              }
               required
               fullWidth
               id="email"
               label="Email Address"
-              name="email"
+              name="emailAddress"
               autoComplete="email"
+              type="email"
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
+              value={formik.values.userName}
+              onChange={formik.handleChange}
+              error={formik.touched.userName && Boolean(formik.errors.userName)}
+              helperText={formik.touched.userName && formik.errors.userName}
+              required
+              fullWidth
+              id="userName"
+              label="Username"
+              name="userName"
+              autoComplete="username"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              value={formik.values.phoneNumber}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)
+              }
+              helperText={
+                formik.touched.phoneNumber && formik.errors.phoneNumber
+              }
+              required
+              fullWidth
+              id="phoneNumber"
+              label="Mobile Number"
+              name="phoneNumber"
+              autoComplete="phoneNumber"
+              type="tel"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              helperText={formik.touched.password && formik.errors.password}
               required
               fullWidth
               name="password"
@@ -83,6 +182,29 @@ export default function SignUp() {
               autoComplete="new-password"
             />
           </Grid>
+          <Grid item xs={12}>
+            <TextField
+              value={formik.values.cPassword}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.cPassword && Boolean(formik.errors.cPassword)
+              }
+              helperText={formik.touched.cPassword && formik.errors.cPassword}
+              required
+              fullWidth
+              name="cPassword"
+              label="Confirm Password"
+              type="password"
+              id="password"
+              autoComplete="new-password"
+            />
+          </Grid>
+          {/* <Grid item xs={12}>
+            <FormControlLabel
+              control={<Checkbox value="allowExtraEmails" color="primary" />}
+              label="I want to receive inspiration, marketing promotions and updates via email."
+            />
+          </Grid> */}
         </Grid>
         <Button
           type="submit"
@@ -92,14 +214,20 @@ export default function SignUp() {
         >
           Sign Up
         </Button>
-        <Grid container justifyContent="flex-end">
+        <Grid container justifyContent="flex-end" spacing={2}>
           <Grid item>
             <Link href="/auth/login" variant="body2">
               Already have an account? Sign in
             </Link>
           </Grid>
+          <Grid item>
+            <Link href="/" variant="body2">
+              {"Just Shop"}
+            </Link>
+          </Grid>
         </Grid>
       </Box>
+      <ToasterAlert {...toaster} isOpen={isOpen} />
     </Box>
   );
 }

@@ -8,12 +8,21 @@ import { setDeleteOpen } from "../../store/modelSlice";
 import { useFormik } from "formik";
 import { bookSchema } from "../../schemas/bookSchema";
 import { useState, useEffect } from "react";
+import { useDeleteBookMutation } from "../../services/bookStoreApi";
 
 export default function _deleteBook({ id }) {
+  const [deleteBook, { isError, data, isLoading, isSuccess, error }] =
+    useDeleteBookMutation();
   const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      await deleteBook(id);
+      dispatch(setDeleteOpen(false));
+    } catch (error) {
+      dispatch(setDeleteOpen(true));
+    }
   };
 
   useEffect(() => {}, []);
@@ -41,7 +50,13 @@ export default function _deleteBook({ id }) {
           justifyContent: "space-between",
         }}
       >
-        <Button variant="contained" size="small" color="error" type="submit">
+        <Button
+          variant="contained"
+          size="small"
+          color="error"
+          type="button"
+          onClick={handleSubmit}
+        >
           Delete
         </Button>
         <Button

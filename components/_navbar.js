@@ -10,7 +10,7 @@ import Badge from "@mui/material/Badge";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import _Drawer from "./_drawer";
-import ThemeSwitch from './_themeSwitch.js'
+import ThemeSwitch from "./_themeSwitch.js";
 import Box from "@mui/material/Box";
 import { useSelector } from "react-redux";
 
@@ -42,7 +42,7 @@ export default function NavBar({ pageTitle }) {
   // const mode = useSelector(state=>state.themeMode.mode)
   return (
     <>
-      <AppBar position="absolute" open={open} >
+      <AppBar position="absolute" open={open}>
         <Toolbar
           sx={{
             pr: "24px", // keep right padding when drawer closed
@@ -65,26 +65,24 @@ export default function NavBar({ pageTitle }) {
             variant="h6"
             color="inherit"
             noWrap
-            sx={{ flexGrow: 1}}
+            sx={{ flexGrow: 1 }}
           >
             {pageTitle}
           </Typography>
-          <Box sx={{display:'flex', gap:2 }}>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <ThemeSwitch />
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <IconButton color="inherit">
+              <Badge badgeContent={4} color="secondary">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+            <ThemeSwitch />
           </Box>
-         
         </Toolbar>
       </AppBar>
       <_Drawer
         open={open}
         toggleDrawer={toggleDrawer}
         drawerwidth={drawerwidth}
-
       />
     </>
   );

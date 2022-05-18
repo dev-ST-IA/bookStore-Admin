@@ -1,33 +1,51 @@
 import Box from "@mui/material/Box";
 import { TextField } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
-import { useGetAllSalesQuery } from "../services/bookStoreApi";
-import { salesColumns } from "../utils/datagrids";
-import { addSize, addPage, addSort, addRange } from "../store/salesQuerySlice";
-import _sorting from "./_sorting";
-import _generalDataGrid from "./_generalDataGrid";
-import _dateRange from "./_dateRange";
+import { useGetAllCustomersQuery } from "../../services/bookStoreApi";
+import { customersColumns } from "../../utils/datagrids";
+import {
+  addSize,
+  addPage,
+  setSearch,
+  addSort,
+  addRange,
+} from "../../store/customersQuerySlice";
+import _sorting from "../_sorting";
+import _generalDataGrid from "../_generalDataGrid";
+import _dateRange from "../_dateRange";
 
 export default function _customerTable() {
   const dispatch = useDispatch();
-  const queries = useSelector((state) => state.salesQuery);
-  const { ...args } = useGetAllSalesQuery(queries);
+  const queries = useSelector((state) => state.customersQuery);
+  const { ...args } = useGetAllCustomersQuery(queries);
   const sort = queries.Sort;
+  const search = queries.search;
   const startDate = queries.start;
   const endDate = queries.end;
 
+  console.log(args.data);
   return (
     <>
       <_generalDataGrid
         sorting={
           <_sorting
             action={addSort}
-            sortables={["date_asc", "date_desc"]}
+            sortables={["name_asc", "name_desc", "date_asc", "date_desc"]}
             sx={{ alignSelf: "flex-end" }}
             value={sort}
           />
         }
-        columns={salesColumns}
+        search={
+          <TextField
+            id="standard-basic"
+            label="Search For Customers"
+            variant="standard"
+            fullWidth
+            onChange={(e) => dispatch(setSearch(e.target.value))}
+            value={search}
+          />
+        }
+        columns={customersColumns}
         getData={{ ...args }}
         pagination={{ addSize, addPage }}
         queries={queries}

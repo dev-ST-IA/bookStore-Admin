@@ -8,25 +8,32 @@ import { setEditOpen } from "../../store/modelSlice";
 import { useFormik } from "formik";
 import { bookSchema } from "../../schemas/bookSchema";
 import { useState, useEffect } from "react";
+import {
+  useGetBookQuery,
+  useEditBookMutation,
+} from "../../services/bookStoreApi";
 
 export default function _editBook({ id }) {
+  const { data, isError, isLoading, isFetching, error, refetch } =
+    useGetBookQuery(id);
   const [initialValues, setInitialValues] = useState({
-    Title: "",
-    Author: "",
-    CategoryName: "",
-    Publisher: "",
-    Price: "",
-    Cost: "",
-    Units: "",
-    Description: "",
-    Image: null,
+    title: "",
+    author: "",
+    categoryName: "",
+    publisher: "",
+    price: "",
+    cost: "",
+    units: "",
+    description: "",
+    image: null,
   });
   const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: {
+      Id: "",
       Title: "",
-      Author: "",
+      AuthorName: "",
       CategoryName: "",
       Publisher: "",
       Price: "",
@@ -40,15 +47,15 @@ export default function _editBook({ id }) {
 
   const isChanged = () => {
     const formikVals = formik.values;
-    const isTitle = formikVals.Title != initialValues.Title;
-    const isAuthor = formikVals.Author != initialValues.Author;
+    const isTitle = formikVals.Title != initialValues?.title;
+    const isAuthor = formikVals.AuthorName != initialValues?.authorName;
     const isCategoryName =
-      formikVals.CategoryName != initialValues.CategoryName;
-    const isPublisher = formikVals.Publisher != initialValues.Publisher;
-    const isPrice = formikVals.Price != initialValues.Price;
-    const isCost = formikVals.Cost != initialValues.Cost;
-    const isUnits = formikVals.Units != initialValues.Units;
-    const isDescription = formikVals.Description != initialValues.Description;
+      formikVals.CategoryName != initialValues?.categoryName;
+    const isPublisher = formikVals.Publisher != initialValues?.publisher;
+    const isPrice = formikVals.Price != initialValues?.price;
+    const isCost = formikVals.Cost != initialValues?.cost;
+    const isUnits = formikVals.Units != initialValues?.units;
+    const isDescription = formikVals.Description != initialValues?.description;
     const isImage = formikVals.Image != null;
     if (
       isTitle ||
@@ -66,11 +73,57 @@ export default function _editBook({ id }) {
     return false;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const setInitialToFormikVals = (data) => {
+    formik.setValues({
+      Id: data.id,
+      Title: data.title,
+      AuthorName: data?.authorName,
+      CategoryName: data.categoryName,
+      Publisher: data.publisher,
+      Price: data.price,
+      Cost: data.cost,
+      Units: data.units,
+      Description: data.description,
+      Image: null,
+    });
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (data) {
+      setInitialValues(data);
+      setInitialToFormikVals(data);
+    }
+    if (isError) {
+      dispatch(setEditOpen(false));
+    }
+  }, [data]);
+  const [
+    edit,
+    {
+      isError: isEditError,
+      isLoading: isEditLoading,
+      isSuccess: isEditSuccess,
+      data: editedData,
+    },
+  ] = useEditBookMutation();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formikValues = formik.values;
+      var form_data = new FormData();
+
+      for (var key in formikValues) {
+        form_data.append(key, formikValues[key]);
+      }
+
+      const response = await edit(form_data).unwrap();
+      formik.resetForm();
+      formik.setValues(formikValues);
+    } catch (error) {
+      formik.setValues(initialValues);
+    }
+  };
 
   return (
     <Box
@@ -125,13 +178,15 @@ export default function _editBook({ id }) {
             fullWidth
             id="new-book-author"
             label="Author"
-            name="Author"
+            name="AuthorName"
             autoComplete="author"
             autoFocus
-            value={formik.values.Author}
+            value={formik.values.AuthorName}
             onChange={formik.handleChange}
-            error={formik.touched.Author && Boolean(formik.errors.Author)}
-            helperText={formik.errors.Author}
+            error={
+              formik.touched.AuthorName && Boolean(formik.errors.AuthorName)
+            }
+            helperText={formik.errors.AuthorName}
           />
           <TextField
             margin="normal"
@@ -230,10 +285,10 @@ export default function _editBook({ id }) {
             <Input
               type="file"
               accept=".jpg, .jpeg, .png"
-              required
               onChange={(e) => formik.setFieldValue("Image", e.target.files[0])}
+              name="Image"
             />
-            {formik.touched.Units && Boolean(formik.errors.Units) && (
+            {formik.touched.Image && Boolean(formik.errors.Image) && (
               <Typography component="body" variant="body1">
                 {formik.errors.Image}
               </Typography>

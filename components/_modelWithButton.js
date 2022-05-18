@@ -27,6 +27,7 @@ export default function _modelWithButton({
   setOpen,
   open = false,
   width = 600,
+  disabled = false,
 }) {
   const dispatch = useDispatch();
   const handleChange = () => {
@@ -41,6 +42,7 @@ export default function _modelWithButton({
         color={buttonColor}
         startIcon={buttonIcon}
         onClick={handleChange}
+        disabled={disabled}
       >
         {buttonText}
       </Button>

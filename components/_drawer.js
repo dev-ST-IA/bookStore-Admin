@@ -9,6 +9,7 @@ import { styled } from "@mui/material/styles";
 import { Typography, Button } from "@mui/material";
 import Link from "next/link";
 import { useSelector } from "react-redux";
+import _logOutListItemButton from "./_logOutListItemButton";
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -39,11 +40,7 @@ const Drawer = styled(MuiDrawer, {
 export default function _Drawer({ open, toggleDrawer, drawerwidth }) {
   // const mode = useSelector(state=>state.themeMode.mode)
   return (
-    <Drawer 
-    variant="permanent" 
-    open={open} 
-    drawerwidth={drawerwidth} 
-    >
+    <Drawer variant="permanent" open={open} drawerwidth={drawerwidth}>
       <Toolbar
         sx={{
           display: "flex",
@@ -66,8 +63,9 @@ export default function _Drawer({ open, toggleDrawer, drawerwidth }) {
       <Divider />
       <List component="nav">
         {mainListItems}
-        <Divider sx={{ my: 1 }} />
+        <Divider flexItem sx={{ my: 1 }} />
         {secondaryListItems}
+        <_logOutListItemButton />
       </List>
     </Drawer>
   );

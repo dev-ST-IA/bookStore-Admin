@@ -6,6 +6,7 @@ const modelSlice = createSlice({
     createOpen: false,
     editOpen: false,
     deleteOpen: false,
+    viewImageOpen: false,
   },
 
   reducers: {
@@ -18,7 +19,11 @@ const modelSlice = createSlice({
     setDeleteOpen: (state, action) => {
       state.deleteOpen = action.payload;
     },
+    setViewImageOpen: (state, action) => {
+      state.viewImageOpen = action.payload;
+    },
   },
 });
-export const { setCreateOpen, setDeleteOpen, setEditOpen } = modelSlice.actions;
+export const { setCreateOpen, setDeleteOpen, setEditOpen, setViewImageOpen } =
+  modelSlice.actions;
 export default modelSlice.reducer;

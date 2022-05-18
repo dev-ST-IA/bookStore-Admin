@@ -2,7 +2,7 @@ import React from "react";
 import Layout from "../components/_layout";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
-import _customersTable from "../components/customerTable.js";
+import _customersTable from "../components/customers/_customerTable";
 
 export default function Customers() {
   return (
@@ -24,4 +24,4 @@ export async function getStaticProps(context) {
 }
 Customers.getLayout = (page, pageTitle = "") => {
   return <Layout pageTitle={pageTitle}>{page}</Layout>;
-};  
+};

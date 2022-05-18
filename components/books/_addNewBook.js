@@ -7,14 +7,17 @@ import { useDispatch } from "react-redux";
 import { setCreateOpen } from "../../store/modelSlice";
 import { useFormik } from "formik";
 import { bookSchema } from "../../schemas/bookSchema";
+import { useCreateBookMutation } from "../../services/bookStoreApi";
 
 export default function _addNewBook() {
+  const [createBook, { isSuccess, isError, isLoading, data, error }] =
+    useCreateBookMutation();
   const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: {
       Title: "",
-      Author: "",
+      AuthorName: "",
       CategoryName: "",
       Publisher: "",
       Price: "",
@@ -27,6 +30,18 @@ export default function _addNewBook() {
   });
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    for (var key in formik.values) {
+      formData.append(key, formik.values[key]);
+    }
+    try {
+      console.log(formData);
+      await createBook(formData);
+      formik.resetForm();
+      dispatch(setCreateOpen(false));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -82,13 +97,15 @@ export default function _addNewBook() {
             fullWidth
             id="new-book-author"
             label="Author"
-            name="Author"
+            name="AuthorName"
             autoComplete="author"
             autoFocus
-            value={formik.values.Author}
+            value={formik.values.AuthorName}
             onChange={formik.handleChange}
-            error={formik.touched.Author && Boolean(formik.errors.Author)}
-            helperText={formik.errors.Author}
+            error={
+              formik.touched.AuthorName && Boolean(formik.errors.AuthorName)
+            }
+            helperText={formik.errors.AuthorName}
           />
           <TextField
             margin="normal"
