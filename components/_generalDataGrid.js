@@ -17,6 +17,7 @@ export default function _generalDataGrid({
   const { data, isError, isLoading, isFetching, error } = getData;
   const { addSize, addPage } = pagination;
   const { Size, Page } = queries;
+
   return (
     <>
       <Box

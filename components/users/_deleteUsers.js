@@ -7,16 +7,23 @@ import { useDispatch } from "react-redux";
 import { setDeleteOpen } from "../../store/modelSlice";
 import { useFormik } from "formik";
 import { useState, useEffect } from "react";
+import { useDeleteUserMutation } from "../../services/bookStoreApi";
 
 export default function _deleteBook({ id }) {
   const dispatch = useDispatch();
-
+  const [deleteUser, { ...deleteArgs }] = useDeleteUserMutation(id);
   const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      await deleteUser(id);
+      dispatch(setDeleteOpen(false));
+    } catch (error) {
+      alert("Deletion Failed");
+    }
   };
 
   useEffect(() => {}, []);
-
+  console.log(deleteArgs.error);
   return (
     <Box
       sx={{
@@ -40,7 +47,12 @@ export default function _deleteBook({ id }) {
           justifyContent: "space-between",
         }}
       >
-        <Button variant="contained" size="small" color="error" type="submit">
+        <Button
+          variant="contained"
+          size="small"
+          color="error"
+          onClick={handleSubmit}
+        >
           Delete
         </Button>
         <Button

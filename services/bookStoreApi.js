@@ -30,7 +30,7 @@ export const bookStoreApi = createApi({
         };
       },
       transformResponse: (response, meta, arg) => {
-        const books = response.books["$values"];
+        const books = response.books;
         const filteredBooks = books.map((book) => ({
           ...book.book,
           categoryId: book.categoryId,
@@ -69,7 +69,7 @@ export const bookStoreApi = createApi({
     }),
     getAllCategories: builder.query({
       query: () => "category/getAll",
-      transformResponse: (response, meta, arg) => response["$values"],
+      transformResponse: (response, meta, arg) => response,
       providesTags: (result) => [{ type: "Books", id: "LIST" }],
     }),
     editBook: builder.mutation({
@@ -130,18 +130,21 @@ export const bookStoreApi = createApi({
     }),
     getAllUsers: builder.query({
       query: (options) => {
-        const { Size, Sort, Page, category } = options;
+        const { Size, Sort, Page, category, search } = options;
         return {
           url: "user/admin/getAll/",
           params: { Size, Sort, Page, category, search },
         };
       },
+      transformResponse: (result, meta, arg) => {
+        return { rows: result };
+      },
       providesTags: (results) => {
         return results
           ? [
-              ...results.users["$values"].map((user) => ({
+              ...results?.rows?.map((user) => ({
                 type: "Users",
-                id: user.id,
+                id: user?.id,
               })),
               { type: "Users", id: "LIST" },
             ]
@@ -149,7 +152,7 @@ export const bookStoreApi = createApi({
       },
     }),
     deleteUser: builder.mutation({
-      query: (id) => `user/delete/${id}`,
+      query: (id) => ({ url: `user/delete/${id}`, method: "DELETE" }),
       invalidatesTags: (result) => [{ type: "Users", id: "LIST" }],
     }),
     //Customers
@@ -181,7 +184,7 @@ export const bookStoreApi = createApi({
           : [{ type: "Customers", id: "LIST" }];
       },
       transformResponse: (response) => {
-        return { rows: response["$values"] };
+        return { rows: response };
       },
     }),
     getNoOfCustomersRegistered: builder.query({
@@ -216,10 +219,10 @@ export const bookStoreApi = createApi({
         };
       },
       transformResponse: (result) => {
-        const orders = result.orders["$values"];
+        const orders = result.orders;
         const ordersTransformed = orders.map((order) => {
           const userId = order.user.id;
-          const cartProducts = order.cartProducts["$values"];
+          const cartProducts = order.cartProducts;
           const cartProductsTransformed = cartProducts.map((cartProduct) => {
             return {
               ...cartProduct.product,
@@ -247,7 +250,7 @@ export const bookStoreApi = createApi({
       query: (id) => `order/get/${id}`,
       providesTags: (result) => [{ type: "Orders", id: result.id }],
       transformResponse: (response) => {
-        const cartProducts = response.cartProducts["$values"];
+        const cartProducts = response.cartProducts;
         const filteredCartProducts = cartProducts.map((item) => ({
           ...item,
           id: item.product.id,
@@ -285,12 +288,13 @@ export const bookStoreApi = createApi({
       },
       providesTags: (result) => [{ type: "Sales", id: "LIST" }],
       transformResponse: (result) => {
-        const rows = result.sales["$values"];
+        console.log(result);
+        const rows = result.sales;
         const transformedRows = rows.map((i) => {
           const date = new Date(`${i.year}/${i.month}/${i.day}`);
           let obj = { ...i };
-          obj.orders = i.orders["$values"];
-          const orders = i.orders["$values"];
+          obj.orders = i.orders;
+          const orders = i.orders;
           const totalSales = orders.reduce(
             (val, i) => val + Number(i.totalSales),
             0
