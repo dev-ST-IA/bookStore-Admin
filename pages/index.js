@@ -1,7 +1,26 @@
-import Head from "next/head";
-import Image from "next/image";
-import styles from "../styles/Home.module.css";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import useAuth from "../hooks/useAuth";
+import Layout from "../components/_layout";
 
-export default function Home() {
-  return <div></div>;
+function Home() {
+  const auth = useAuth();
+  const isUserLoggedIn = auth?.isUserLogged;
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isUserLoggedIn) {
+      router.push("/dashboard");
+    } else {
+      router.push("auth/login");
+    }
+  });
+
+  return null;
 }
+
+Home.getLayout = (page, pageTitle = "") => {
+  return <Layout pageTitle={pageTitle}>{page}</Layout>;
+};
+
+export default Home;

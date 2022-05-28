@@ -1,17 +1,25 @@
 import "../styles/globals.css";
-import Layout from "../components/_layout";
-import { useRouter } from "next/router";
 import { Provider } from "react-redux";
-import { store } from "../store/store";
+import { store } from "../store/store.js";
+import { PersistGate } from "redux-persist/integration/react";
+import { persistor } from "../store/store.js";
+import AuthProvider from "../components/auth/_authProvider";
 
 function MyApp({ Component, pageProps }) {
-  const getLayout = Component.getLayout || ((page) => page);
-  // console.log(Component);
+  const Layout =
+    Component.getLayout ||
+    ((page) => {
+      page;
+    });
+  const pageTitle = pageProps.pageTitle;
+
   return (
     <Provider store={store}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <PersistGate loading={null} persistor={persistor}>
+        <AuthProvider>
+          {Layout(<Component {...pageProps} />, pageTitle)}
+        </AuthProvider>
+      </PersistGate>
     </Provider>
   );
 }

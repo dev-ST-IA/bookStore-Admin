@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -10,16 +10,57 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { useRouter } from "next/dist/client/router";
+import { useLoginMutation } from "../../services/bookStoreApi";
+import { useFormik } from "formik";
+import { loginSchema } from "../../schemas/loginSchema";
+import { Switch } from "@mui/material";
+import ToasterAlert from "../_alertToaster";
+import { useSelector, useDispatch } from "react-redux";
+import { setOpen } from "../../store/toasterSlice";
+import { setToken, setUserDetails } from "../../store/authSlice";
 
 export default function SignIn() {
+  const [toaster, setToaster] = useState({ message: "", severity: "" });
+  const isOpen = useSelector((state) => state.toaster.open);
+  const [checked, setChecked] = useState(true);
+  const [login, { data, isError, isSuccess, isLoading, error }] =
+    useLoginMutation();
   const router = useRouter();
-  const handleSubmit = (event) => {
+  const dispatch = useDispatch();
+
+  const formik = useFormik({
+    initialValues: {
+      userName: "",
+      emailAddress: "",
+      password: "",
+    },
+    validationSchema: loginSchema,
+  });
+  const handleSwitch = (event) => {
+    setChecked(event.target.checked);
+    formik.setFieldValue("emailAddress", "");
+    formik.setFieldValue("userName", "");
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    try {
+      const res = await login(formik.values).unwrap();
+      dispatch(setToken(res.token));
+      dispatch(setUserDetails(res));
+      setToaster({
+        message: `Login Success`,
+        severity: "success",
+      });
+      dispatch(setOpen(true));
+      router.push("/");
+    } catch (err) {
+      setToaster({
+        message: `Login Failed \n Error: ${err?.data?.title}`,
+        severity: "error",
+      });
+      dispatch(setOpen(true));
+    }
   };
 
   return (
@@ -30,7 +71,7 @@ export default function SignIn() {
         alignItems: "center",
         px: 10,
         py: 5,
-        margin: "auto",
+        margin: "2rem auto",
         border: "1px solid black",
       }}
       maxWidth="sm"
@@ -41,18 +82,59 @@ export default function SignIn() {
       <Typography component="h1" variant="h5">
         Sign in
       </Typography>
-      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="email"
-          label="Email Address"
-          name="email"
-          autoComplete="email"
-          autoFocus
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={checked}
+              onChange={handleSwitch}
+              inputProps={{ "aria-label": "controlled" }}
+            />
+          }
+          label={checked ? "Email" : "Username"}
         />
+
+        {checked && (
+          <TextField
+            value={formik.values.emailAddress}
+            onChange={formik.handleChange}
+            error={
+              formik.touched.emailAddress && Boolean(formik.errors.emailAddress)
+            }
+            helperText={formik.errors.emailAddress}
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="emailAddress"
+            autoComplete="email"
+            autoFocus
+            type="email"
+          />
+        )}
+        {!checked && (
+          <TextField
+            value={formik.values.userName}
+            onChange={formik.handleChange}
+            error={formik.touched.userName && Boolean(formik.errors.userName)}
+            helperText={formik.errors.userName}
+            margin="normal"
+            required
+            fullWidth
+            id="userName"
+            label="Username"
+            name="userName"
+            autoComplete="username"
+            autoFocus
+            type="text"
+          />
+        )}
         <TextField
+          value={formik.values.password}
+          onChange={formik.handleChange}
+          error={formik.touched.password && Boolean(formik.errors.password)}
+          helperText={formik.errors.password}
           margin="normal"
           required
           fullWidth
@@ -60,12 +142,12 @@ export default function SignIn() {
           label="Password"
           type="password"
           id="password"
-          autoComplete="current-password"
+          autoComplete="password"
         />
-        <FormControlLabel
+        {/* <FormControlLabel
           control={<Checkbox value="remember" color="success" />}
           label="Remember me"
-        />
+        /> */}
         <Button
           type="submit"
           fullWidth
@@ -74,7 +156,7 @@ export default function SignIn() {
         >
           Sign In
         </Button>
-        <Grid container>
+        <Grid container spacing={2}>
           <Grid item xs>
             <Link href="#" variant="body2">
               Forgot password?
@@ -85,8 +167,14 @@ export default function SignIn() {
               {"Don't have an account? Sign Up"}
             </Link>
           </Grid>
+          <Grid item>
+            <Link href="/" variant="body2">
+              {"Just Shop"}
+            </Link>
+          </Grid>
         </Grid>
       </Box>
+      <ToasterAlert {...toaster} isOpen={isOpen} />
     </Box>
   );
 }
